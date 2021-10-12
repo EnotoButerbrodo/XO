@@ -51,17 +51,23 @@ public class MainLogic : MonoBehaviour
         }
     }
 
-    void CageClickLogic(Cage cage){
+    void CageClickLogic(Cage cage)
+    {
         if(!cage.IsFilled){
-            cage.OwnerId = currentTurnCharacter.Id;
-            Debug.Log(currentTurnCharacter.Id);
+            SetCageOwner(cage, currentTurnCharacter);
+            NextTurnLogic();
         }
-
-
+    }
+    void SetCageOwner(Cage cage, Character character)
+    {
+        cage.OwnerId = currentTurnCharacter.Id;
+        cage.IsFilled = true;
     }
 
-    public void SetCageOwner(Cage cage, int playerId){
-        cage.Id = playerId;
+    void NextTurnLogic()
+    {
+        currentTurnCharacter = characters.Where(character=> character !=currentTurnCharacter).First();
+        Debug.Log(currentTurnCharacter.Name);
     }
 
 
