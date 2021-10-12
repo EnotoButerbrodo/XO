@@ -67,7 +67,24 @@ public class MainLogic : MonoBehaviour
     void NextTurnLogic()
     {
         currentTurnCharacter = characters.Where(character=> character !=currentTurnCharacter).First();
+        CheckWin(out Character chara);
         Debug.Log(currentTurnCharacter.Name);
+    }
+
+    bool CheckWin(out Character winner){
+        //Проверить столбцы
+        for(int row = 0; row < 3; row++){
+            int avverage = 0;
+            for(int column = 0; column < 3; column++)
+            {
+                avverage += GameField[row, column].OwnerId;
+            }
+            avverage /= 3;
+            Debug.Log($"avverage {avverage}");
+
+        }
+        winner = null;
+        return true;
     }
 
 
