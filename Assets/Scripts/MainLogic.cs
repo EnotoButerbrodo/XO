@@ -6,16 +6,27 @@ using System.Linq;
 public class MainLogic : MonoBehaviour
 {
     [SerializeField] private Character[] characters;
-    [SerializeField] private List<GameObject> cages;
+    [SerializeField] private List<Cage> cages;
     private Cage[,] GameField;
+
+
         // Start is called before the first frame update
     void Start()
     {
         if(cages.Count != 9){
             throw new System.Exception("Пошел нахуй");
         }
+        FillGameField();
     }
-
+    void FillGameField(){
+        GameField = new Cage[3,3];
+        foreach(Cage cage in cages){
+            
+            GameField[cage.coordinates.x, cage.coordinates.y] = cage;
+            Debug.Log(GameField[cage.coordinates.x, cage.coordinates.y]);
+        }
+        
+    }
     // Update is called once per frame
     void Update()
     {
@@ -33,7 +44,14 @@ public class MainLogic : MonoBehaviour
         }
     }
 
+    void CageClickLogic(Cage cage){
+
+
+    }
+
     public void SetCageOwner(Cage cage, int playerId){
         cage.Id = playerId;
     }
+
+
 }

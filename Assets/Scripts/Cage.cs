@@ -8,6 +8,7 @@ public class Cage : MonoBehaviour
     public int Id;
     public int OwnerId;
     [SerializeField]public Point coordinates;
+    public bool IsFilled = false;
 
     public Cage(int Id, int OwnerId, Point coordinates){
         this.Id = Id;
