@@ -7,6 +7,8 @@ public class MainLogic : MonoBehaviour
 {
     [SerializeField] private Character[] characters;
     [SerializeField] private List<Cage> cages;
+
+    [SerializeField]private Character currentTurnCharacter;
     private Cage[,] GameField;
 
 
@@ -16,9 +18,11 @@ public class MainLogic : MonoBehaviour
         if(cages.Count != 9){
             throw new System.Exception("Пошел нахуй");
         }
-        FillGameField();
+        FillGameField(); 
+        ChooseFirstCharacter();
     }
-    void FillGameField(){
+    void FillGameField()
+    {
         GameField = new Cage[3,3];
         foreach(Cage cage in cages){
             
@@ -27,7 +31,10 @@ public class MainLogic : MonoBehaviour
         }
         
     }
-    // Update is called once per frame
+    void ChooseFirstCharacter(){
+        currentTurnCharacter = characters[0];
+    }
+
     void Update()
     {
         if( Input.GetMouseButtonDown(0) )
@@ -35,8 +42,8 @@ public class MainLogic : MonoBehaviour
             RaycastHit2D rayHit = Physics2D.GetRayIntersection(Camera.main.ScreenPointToRay(Input.mousePosition));
             if(rayHit.transform != null){
                 var cage = rayHit.transform.GetComponent<Cage>();
-                if(cage != null){
-                    Debug.Log(cage.Id);
+                if(!(cage is null)){
+                   CageClickLogic(cage);
                 }
                 else   
                     Debug.Log("Не cage");
@@ -45,6 +52,10 @@ public class MainLogic : MonoBehaviour
     }
 
     void CageClickLogic(Cage cage){
+        if(!cage.IsFilled){
+            cage.OwnerId = currentTurnCharacter.Id;
+            Debug.Log(currentTurnCharacter.Id);
+        }
 
 
     }
