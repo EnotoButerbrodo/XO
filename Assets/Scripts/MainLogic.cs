@@ -5,6 +5,7 @@ using System.Linq;
 
 public class MainLogic : MonoBehaviour
 {
+    [SerializeField] private Character[] characters;
     [SerializeField] private List<GameObject> cages;
     private Cage[,] GameField;
         // Start is called before the first frame update
