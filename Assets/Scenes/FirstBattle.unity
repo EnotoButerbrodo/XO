@@ -321,7 +321,11 @@ MonoBehaviour:
   - {fileID: 1807942476}
   - {fileID: 883435328839133912}
   gameField: {fileID: 1607964273}
-  currentTurnCharacter: {fileID: 0}
+  Rows: 0
+  Collumns: 0
+  UpDiagonal: 0
+  DownDiagonal: 0
+  currentTurnCharacter: {fileID: 1807942476}
 --- !u!4 &545584347
 Transform:
   m_ObjectHideFlags: 0
