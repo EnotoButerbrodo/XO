@@ -13,19 +13,28 @@ public class MainLogic :  MonoBehaviour
     [SerializeField]int UpDiagonal;
     [SerializeField]int DownDiagonal;
 
-     struct Stat{
+    struct WinPattern{
         public int OwnerId; 
         public int CageCount; 
-        public string Entity; 
-        public int EntityCount;
+        public PatternType Pattern; 
+        public int PatternCount;
+
+        public enum PatternType{
+        Row,
+        Collumn,
+        UpDiagonal,
+        DownDiagonal
+        }
 
         public override string ToString()
         {
-            return $"Owner:{OwnerId} CageCount:{CageCount} {Entity}: {EntityCount}";
+            return $"Owner:{OwnerId} CageCount:{CageCount} {Pattern}: {PatternCount}";
         }
     }
+    
+    
 
-    List<Stat> GameStats;
+    List<WinPattern> GameStats;
     [SerializeField]private Character currentTurnCharacter;
 
         // Start is called before the first frame update
@@ -107,63 +116,60 @@ public class MainLogic :  MonoBehaviour
         //Rows
         GetGameStats();
         //Проверить строки
-        var rowResult = GameStats.Where(stat=> stat.Entity == "row" && stat.CageCount == Rows)
+        var rowResult = GameStats.Where(stat=> stat.Pattern == WinPattern.PatternType.Row && stat.CageCount == Rows)
                 .FirstOrDefault();
-       if(!rowResult.Equals(default(Stat)))
+       if(!rowResult.Equals(default(WinPattern)))
            Debug.Log(rowResult);
        
 
-       var columnResult = GameStats.Where(stat=> stat.Entity == "column" && stat.CageCount == Collumns)
+       var columnResult = GameStats.Where(stat=> stat.Pattern == WinPattern.PatternType.Collumn && stat.CageCount == Collumns)
                 .FirstOrDefault();
-        if(!columnResult.Equals(default(Stat)))
+        if(!columnResult.Equals(default(WinPattern)))
            Debug.Log(columnResult);
        
-       var UpDiagonalResult = GameStats.Where(stat=> stat.Entity == "Up Diagonal" && stat.CageCount == UpDiagonal)
+       var UpDiagonalResult = GameStats.Where(stat=> stat.Pattern == WinPattern.PatternType.UpDiagonal && stat.CageCount == UpDiagonal)
                 .FirstOrDefault();
-        if(!UpDiagonalResult.Equals(default(Stat)))
+        if(!UpDiagonalResult.Equals(default(WinPattern)))
            Debug.Log(UpDiagonalResult);
 
-        var DownDiagonalResult = GameStats.Where(stat=> stat.Entity == "Down Diagonal" && stat.CageCount == DownDiagonal)
+        var DownDiagonalResult = GameStats.Where(stat=> stat.Pattern == WinPattern.PatternType.DownDiagonal && stat.CageCount == DownDiagonal)
                 .FirstOrDefault();
-        if(!DownDiagonalResult.Equals(default(Stat)))
+        if(!DownDiagonalResult.Equals(default(WinPattern)))
            Debug.Log(DownDiagonalResult);
-
-
-
 
        return false;
     }
+
+    
 
     void GetGameStats(){
         GameStats =
                     cages.Where(cage=> cage.OwnerId != 0)
                     .GroupBy(group=> new {group.OwnerId, group.coordinates.row})
-                    .Select(group=> new Stat{OwnerId = group.Key.OwnerId, CageCount = group.Count(), 
-                                        Entity = "row", EntityCount = group.Key.row})
+                    .Select(group=> new WinPattern{OwnerId = group.Key.OwnerId, CageCount = group.Count(), 
+                                        Pattern = WinPattern.PatternType.Row, PatternCount = group.Key.row})
                     .ToList();
         //Columns
         GameStats.AddRange(
                     cages.Where(cage=> cage.OwnerId != 0)
                     .GroupBy(group=> new {group.OwnerId, group.coordinates.column})
-                    .Select(group=> new Stat{OwnerId = group.Key.OwnerId, CageCount = group.Count(), 
-                                        Entity = "column", EntityCount = group.Key.column})
+                    .Select(group=> new WinPattern{OwnerId = group.Key.OwnerId, CageCount = group.Count(), 
+                                        Pattern = WinPattern.PatternType.Collumn, PatternCount = group.Key.column})
                     .ToList());
         //Up diagonal
         GameStats.AddRange(
                     cages.Where(cage=> cage.OwnerId != 0 && cage.coordinates.column == cage.coordinates.row)
                     .GroupBy(group=> new {group.OwnerId})
-                    .Select(group=> new Stat{OwnerId = group.Key.OwnerId, CageCount = group.Count(), 
-                                        Entity = "Up Diagonal", EntityCount = 0})
+                    .Select(group=> new WinPattern{OwnerId = group.Key.OwnerId, CageCount = group.Count(), 
+                                        Pattern = WinPattern.PatternType.UpDiagonal, PatternCount = 0})
                     .ToList());
         //Down diagonal
         GameStats.AddRange(
                     cages.Where(cage=> cage.OwnerId != 0 && ((Collumns - 1) - cage.coordinates.column) == cage.coordinates.row)
                     .GroupBy(group=> new {group.OwnerId})
-                    .Select(group=> new Stat{OwnerId = group.Key.OwnerId, CageCount = group.Count(), 
-                                        Entity = "Down Diagonal", EntityCount = 1})
+                    .Select(group=> new WinPattern{OwnerId = group.Key.OwnerId, CageCount = group.Count(), 
+                                        Pattern = WinPattern.PatternType.DownDiagonal, PatternCount = 1})
                     .ToList());
-        //GameStats.ForEach(group => Debug.Log($"{group.Entity} {group.EntityCount}: owner:{group.OwnerId} count:{group.CageCount}"));
-        //Debug.Log(new string('=', 100));
     }
 
    
