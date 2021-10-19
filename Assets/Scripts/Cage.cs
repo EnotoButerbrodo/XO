@@ -19,10 +19,10 @@ public class Cage : MonoBehaviour
 }
 [System.Serializable]
 public struct Point{
-    public int x;
-    public int y;
-    public Point(int x, int y){
-        this.x = x;
-        this.y = y;
+    public int row;
+    public int column;
+    public Point(int row, int column){
+        this.row = row;
+        this.column = column;
     }
 }
