@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEditor;
+using UnityEngine.SceneManagement;
 
 public class MainLogic :  MonoBehaviour
 {
@@ -33,10 +34,17 @@ public class MainLogic :  MonoBehaviour
     [SerializeField]Dictionary<WinPatternInfo.PatternType, int> PatternsGoal = new Dictionary<WinPatternInfo.PatternType, int>();
 
     List<WinPatternInfo> GameStats;
-    [SerializeField]private Character currentTurnCharacter;
+
+    bool MayTurn = true;
 
         // Start is called before the first frame update
     void Start()
+    {
+        AnalysGameField();
+       
+    }
+
+    void AnalysGameField()
     {
         cages = gameField.GetComponentsInChildren<Cage>()
                                                .ToList();
@@ -50,20 +58,8 @@ public class MainLogic :  MonoBehaviour
         PatternsGoal.Add(WinPatternInfo.PatternType.DownDiagonal
                 ,cages.Where(prop=> ((PatternsGoal[WinPatternInfo.PatternType.Collumn] - 1) - prop.coordinates.column) == prop.coordinates.row)
                 .GroupBy(prop=> prop).Count());
-        
-        foreach(var goal in PatternsGoal){
-            Debug.Log($"{goal.Key} {goal.Value}");
-        }
-        ChooseFirstCharacter();
     }
-    void FillGameField()
-    {
-
-        
-    }
-    void ChooseFirstCharacter(){
-        currentTurnCharacter = characters.Where(character=> character.name.Contains("Jotaro")).First();
-    }
+    
 
     void Update()
     {
@@ -73,7 +69,7 @@ public class MainLogic :  MonoBehaviour
             if(rayHit.transform != null){
                 var cage = rayHit.transform.GetComponent<Cage>();
                 if(!(cage is null)){
-                   CageClickLogic(cage);
+                   StartCoroutine(CageClickLogic(cage));
                 }
                 else   
                     Debug.Log("Не cage");
@@ -81,17 +77,36 @@ public class MainLogic :  MonoBehaviour
         }
     }
 
-    void CageClickLogic(Cage cage)
+    IEnumerator CageClickLogic(Cage cage)
     {
-        if(!cage.IsFilled)
-        {
-            SetCageOwner(cage, characters[0]);
-            CheckWin();
-            EnemyTurnLogic();
-            CheckWin();
+        if(!cage.IsFilled){
+            if(MayTurn){
+                MayTurn = false;
+                SetCageOwner(cage, characters[0]);
+                yield return new WaitForSecondsRealtime(0.5f); 
+                if(CheckWin()) 
+                {
+                    yield return new WaitForSecondsRealtime(1);
+                    SceneManager.LoadScene("FirstBattle");
+                    MayTurn = true;
+                }   
+                yield return new WaitForSecondsRealtime(0.5f); 
+                EnemyTurnLogic();
+                yield return new WaitForSecondsRealtime(0.5f); 
+                if(CheckWin())  
+                {
+                    yield return new WaitForSecondsRealtime(1);
+                    SceneManager.LoadScene("FirstBattle");
+                    MayTurn = true;
+                }
+                yield return new WaitForSecondsRealtime(0.5f);
+                MayTurn = true;
+            }
+           
         }
         
     }
+
     void SetCageOwner(Cage cage, Character character)
     {
         cage.OwnerId = character.Id;
@@ -103,7 +118,6 @@ public class MainLogic :  MonoBehaviour
             renderer.sprite = character.appearance;
     }
 
-   
 
     void EnemyTurnLogic(){
         
@@ -119,11 +133,13 @@ public class MainLogic :  MonoBehaviour
         GetGameStats();
         //Проверить строки
         if(ChechPatterns(out WinPatternInfo winPattern)){
+            new WaitForSeconds(10);
             Debug.Log(winPattern);
             EditorUtility.DisplayDialog("Победа", 
                 characters.Where(character=> character.Id == winPattern.OwnerId)
                     .Select(character=> character.Name)
                     .First(), "Заебись");
+            return true;
         }
 
        return false;
@@ -138,8 +154,6 @@ public class MainLogic :  MonoBehaviour
         return false;
     }
     
-
-
     void GetGameStats(){
         GameStats =
                     cages.Where(cage=> cage.OwnerId != 0)
