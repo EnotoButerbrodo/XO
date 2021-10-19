@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class MainLogic :  MonoBehaviour
 {
+    [SerializeField] private Sprite defaulCageSprite;
     [SerializeField] private Character[] characters;
     [SerializeField] private GameObject gameField;
     private List<Cage> cages;
@@ -87,7 +88,8 @@ public class MainLogic :  MonoBehaviour
                 if(CheckWin()) 
                 {
                     yield return new WaitForSecondsRealtime(5);
-                    SceneManager.LoadScene("FirstBattle");
+                    //SceneManager.LoadScene("FirstBattle");
+                    ClearGameField();
                     MayTurn = true;
                 }   
                 yield return new WaitForSecondsRealtime(0.5f); 
@@ -96,7 +98,8 @@ public class MainLogic :  MonoBehaviour
                 if(CheckWin())  
                 {
                     yield return new WaitForSecondsRealtime(5);
-                    SceneManager.LoadScene("FirstBattle");
+                    //SceneManager.LoadScene("FirstBattle");
+                    ClearGameField();
                     MayTurn = true;
                 }
                 yield return new WaitForSecondsRealtime(0.5f);
@@ -187,5 +190,13 @@ public class MainLogic :  MonoBehaviour
                     .ToList());
     }
 
-   
+   void ClearGameField(){
+       cages.ForEach(cage=> {
+           cage.OwnerId = 0;
+           cage.gameObject.GetComponentsInChildren<SpriteRenderer>()
+            .Where(sr=> sr.gameObject.name == "Main").FirstOrDefault().sprite = defaulCageSprite;
+            ;
+           cage.IsFilled = false;
+       });
+   }
 }

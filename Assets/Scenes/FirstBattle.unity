@@ -317,6 +317,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e962bb1eb6cc02488024590361c35f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaulCageSprite: {fileID: 7482667652216324306, guid: 48e93eef0688c4a259cb0eddcd8661f7, type: 3}
   characters:
   - {fileID: 883435328839133912}
   - {fileID: 1807942476}
@@ -976,9 +977,9 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: a082ab5823f79114389d481fcd244348, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.19
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
