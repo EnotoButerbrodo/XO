@@ -8,5 +8,7 @@ public class Character : MonoBehaviour
     [SerializeField]public Sprite appearance;
     [SerializeField]public string Name;
     [SerializeField]public int Id;
+    [SerializeField]public AudioSource turnAudio;
+    [SerializeField]public AudioSource winAudio;
 
 }

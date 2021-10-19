@@ -86,7 +86,7 @@ public class MainLogic :  MonoBehaviour
                 yield return new WaitForSecondsRealtime(0.5f); 
                 if(CheckWin()) 
                 {
-                    yield return new WaitForSecondsRealtime(1);
+                    yield return new WaitForSecondsRealtime(5);
                     SceneManager.LoadScene("FirstBattle");
                     MayTurn = true;
                 }   
@@ -95,7 +95,7 @@ public class MainLogic :  MonoBehaviour
                 yield return new WaitForSecondsRealtime(0.5f); 
                 if(CheckWin())  
                 {
-                    yield return new WaitForSecondsRealtime(1);
+                    yield return new WaitForSecondsRealtime(5);
                     SceneManager.LoadScene("FirstBattle");
                     MayTurn = true;
                 }
@@ -113,7 +113,7 @@ public class MainLogic :  MonoBehaviour
         cage.IsFilled = true;
         SpriteRenderer renderer = cage.gameObject.GetComponentsInChildren<SpriteRenderer>()
         .Where(sr=> sr.gameObject.name == "Main").FirstOrDefault();
-
+        character.turnAudio.Play();
         if(renderer is SpriteRenderer)
             renderer.sprite = character.appearance;
     }
@@ -133,18 +133,21 @@ public class MainLogic :  MonoBehaviour
         GetGameStats();
         //Проверить строки
         if(ChechPatterns(out WinPatternInfo winPattern)){
-            new WaitForSeconds(10);
-            Debug.Log(winPattern);
-            EditorUtility.DisplayDialog("Победа", 
-                characters.Where(character=> character.Id == winPattern.OwnerId)
-                    .Select(character=> character.Name)
-                    .First(), "Заебись");
+            StartCoroutine(Win(winPattern.OwnerId));
             return true;
         }
 
        return false;
     }
 
+    IEnumerator Win(int id)
+    {
+        Character winner = characters.Where(character=> character.Id == id).First();
+        winner.winAudio.Play();
+        yield return new WaitForSecondsRealtime(5);
+        EditorUtility.DisplayDialog("Победа", 
+                winner.Name, "Заебись");
+    }
     bool ChechPatterns(out WinPatternInfo winPattern){
         winPattern = GameStats.Where(wP => wP.CageCount == PatternsGoal[wP.Pattern])
                     .FirstOrDefault();

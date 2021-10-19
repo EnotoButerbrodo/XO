@@ -318,14 +318,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characters:
-  - {fileID: 1807942476}
   - {fileID: 883435328839133912}
+  - {fileID: 1807942476}
   gameField: {fileID: 1607964273}
-  Rows: 0
-  Collumns: 0
-  UpDiagonal: 0
-  DownDiagonal: 0
-  currentTurnCharacter: {fileID: 1807942476}
 --- !u!4 &545584347
 Transform:
   m_ObjectHideFlags: 0
@@ -1268,6 +1263,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4747589657342356255, guid: b02441b1feb237049a7e62f34a8f86bf, type: 3}
+      propertyPath: m_audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 31c24dfa0470b7241bc8ff82c2aed56e, type: 3}
     - target: {fileID: 5686253608588741635, guid: b02441b1feb237049a7e62f34a8f86bf, type: 3}
       propertyPath: m_Name
       value: Jotaro Kujo
