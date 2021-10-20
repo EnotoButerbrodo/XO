@@ -10,7 +10,9 @@ public class MainLogic :  MonoBehaviour
     [SerializeField] private Sprite defaulCageSprite;
     [SerializeField] private Character[] characters;
     [SerializeField] private GameObject gameField;
+    [SerializeField] private AudioSource audioSource;
     private List<Cage> cages;
+    [SerializeField]Character currentCharacter;
 
     struct WinPatternInfo
     {
@@ -36,13 +38,17 @@ public class MainLogic :  MonoBehaviour
 
     List<WinPatternInfo> GameStats;
 
-    bool MayTurn = true;
+
 
         // Start is called before the first frame update
     void Start()
     {
         AnalysGameField();
-       
+        SetFirtsPlayer();
+    }
+
+    void SetFirtsPlayer(){
+        currentCharacter = characters[Random.Range(0, characters.Count())];
     }
 
     void AnalysGameField()
@@ -81,6 +87,17 @@ public class MainLogic :  MonoBehaviour
     IEnumerator CageClickLogic(Cage cage)
     {
         if(!cage.IsFilled){
+            SetCageOwner(cage, currentCharacter);
+            
+            yield return new WaitForSecondsRealtime(0.5f); 
+            if(CheckWin()) 
+            {
+                    yield return new WaitForSecondsRealtime(5);
+                    ClearGameField();
+            }   
+            currentCharacter = characters
+                        .Where(Character => Character!= currentCharacter).First();
+            /*
             if(MayTurn){
                 MayTurn = false;
                 SetCageOwner(cage, characters[0]);
@@ -105,6 +122,7 @@ public class MainLogic :  MonoBehaviour
                 yield return new WaitForSecondsRealtime(0.5f);
                 MayTurn = true;
             }
+            */
            
         }
         
@@ -116,7 +134,8 @@ public class MainLogic :  MonoBehaviour
         cage.IsFilled = true;
         SpriteRenderer renderer = cage.gameObject.GetComponentsInChildren<SpriteRenderer>()
         .Where(sr=> sr.gameObject.name == "Main").FirstOrDefault();
-        character.turnAudio.Play();
+        //character.turnAudio.Play();
+        PlayRandomAudio(MusicPack.MusicPackType.Turn);
         if(renderer is SpriteRenderer)
             renderer.sprite = character.appearance;
     }
@@ -146,7 +165,7 @@ public class MainLogic :  MonoBehaviour
     IEnumerator Win(int id)
     {
         Character winner = characters.Where(character=> character.Id == id).First();
-        winner.winAudio.Play();
+        PlayRandomAudio(MusicPack.MusicPackType.Win);
         yield return new WaitForSecondsRealtime(5);
         EditorUtility.DisplayDialog("Победа", 
                 winner.Name, "Заебись");
@@ -195,8 +214,22 @@ public class MainLogic :  MonoBehaviour
            cage.OwnerId = 0;
            cage.gameObject.GetComponentsInChildren<SpriteRenderer>()
             .Where(sr=> sr.gameObject.name == "Main").FirstOrDefault().sprite = defaulCageSprite;
-            ;
+            
            cage.IsFilled = false;
        });
+   }
+
+   AudioClip GetRandomAudio(MusicPack.MusicPackType type){
+       return currentCharacter.musicPacks
+            .Where(musicPack=> musicPack.packType == type)
+            .First().GetRandom();
+   }
+
+   void PlayAudioClip(AudioClip clip){
+       audioSource.PlayOneShot(clip);
+   }
+
+   void PlayRandomAudio(MusicPack.MusicPackType type){
+       PlayAudioClip(GetRandomAudio(type));
    }
 }
