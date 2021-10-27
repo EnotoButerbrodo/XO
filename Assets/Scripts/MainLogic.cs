@@ -13,7 +13,7 @@ public class MainLogic :  MonoBehaviour
     [SerializeField] private AudioSource audioSource;
     private List<Cage> cages;
     [SerializeField]Character currentCharacter;
-
+    bool MayTurn = true;
     struct WinPatternInfo
     {
         public int OwnerId; 
@@ -86,17 +86,17 @@ public class MainLogic :  MonoBehaviour
 
     IEnumerator CageClickLogic(Cage cage)
     {
-        if(!cage.IsFilled){
+        if(!cage.IsFilled && MayTurn){
             SetCageOwner(cage, currentCharacter);
-            
+            currentCharacter = characters
+                        .Where(Character => Character!= currentCharacter).First();
             yield return new WaitForSecondsRealtime(0.5f); 
             if(CheckWin()) 
             {
                     yield return new WaitForSecondsRealtime(5);
                     ClearGameField();
             }   
-            currentCharacter = characters
-                        .Where(Character => Character!= currentCharacter).First();
+            
             /*
             if(MayTurn){
                 MayTurn = false;
@@ -135,7 +135,7 @@ public class MainLogic :  MonoBehaviour
         SpriteRenderer renderer = cage.gameObject.GetComponentsInChildren<SpriteRenderer>()
         .Where(sr=> sr.gameObject.name == "Main").FirstOrDefault();
         //character.turnAudio.Play();
-        PlayRandomAudio(MusicPack.MusicPackType.Turn);
+        PlayRandomAudio(character, MusicPack.MusicPackType.Turn);
         if(renderer is SpriteRenderer)
             renderer.sprite = character.appearance;
     }
@@ -151,6 +151,12 @@ public class MainLogic :  MonoBehaviour
     
     bool CheckWin()
     {
+        if(CheckPat()){
+            EditorUtility.DisplayDialog("OYAYAYAAAI",
+            "Pat", "Ok");
+            ClearGameField();
+            return false;
+        }
         //Rows
         GetGameStats();
         //Проверить строки
@@ -162,10 +168,14 @@ public class MainLogic :  MonoBehaviour
        return false;
     }
 
+    bool CheckPat(){
+        return cages.Where(cage=> !cage.IsFilled).Count() == 0;
+    }
     IEnumerator Win(int id)
     {
+        MayTurn = false;
         Character winner = characters.Where(character=> character.Id == id).First();
-        PlayRandomAudio(MusicPack.MusicPackType.Win);
+        PlayRandomAudio(winner, MusicPack.MusicPackType.Win);
         yield return new WaitForSecondsRealtime(5);
         EditorUtility.DisplayDialog("Победа", 
                 winner.Name, "Заебись");
@@ -217,9 +227,10 @@ public class MainLogic :  MonoBehaviour
             
            cage.IsFilled = false;
        });
+       MayTurn = true;
    }
 
-   AudioClip GetRandomAudio(MusicPack.MusicPackType type){
+   AudioClip GetRandomAudio(Character character, MusicPack.MusicPackType type){
        return currentCharacter.musicPacks
             .Where(musicPack=> musicPack.packType == type)
             .First().GetRandom();
@@ -229,7 +240,9 @@ public class MainLogic :  MonoBehaviour
        audioSource.PlayOneShot(clip);
    }
 
-   void PlayRandomAudio(MusicPack.MusicPackType type){
-       PlayAudioClip(GetRandomAudio(type));
+   void PlayRandomAudio(Character character, MusicPack.MusicPackType type){
+       PlayAudioClip(character.musicPacks
+            .Where(musicPack=> musicPack.packType == type)
+            .First().GetRandom());
    }
 }
